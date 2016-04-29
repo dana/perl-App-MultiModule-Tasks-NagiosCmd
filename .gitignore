@@ -1,0 +1,6 @@
+*.sw?
+.build/*
+state/*
+App-MultiModule-*
+debug.out
+nagios_cmd.log

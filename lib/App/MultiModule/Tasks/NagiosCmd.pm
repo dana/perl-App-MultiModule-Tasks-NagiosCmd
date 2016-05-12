@@ -69,16 +69,19 @@ sub _write_tick {
                 host_name           => $cmd->{nagios_host_name},
                 check_name          => $cmd->{nagios_check_name},
             ) or die 'Nagios::Passive->create() returned false';
-            $np->return_code($cmd->{nagios_return_code})
-                or die 'Nagios::Passive->return_code() returned false';
-            $np->output($cmd->{nagios_output})
-                or die 'Nagios::Passive->output() returned false';
+            my $ret = $np->return_code($cmd->{nagios_return_code});
+            die 'Nagios::Passive->return_code() returned undefined'
+                if not defined $ret;
+            $ret = $np->output($cmd->{nagios_output});
+            die 'Nagios::Passive->output() returned undefined'
+                if not defined $ret;
             $np->submit
                 or die 'Nagios::Passive->submit() returned false';
         };
         alarm 0;
         if($@) {
             $self->error("App::MultiModule::Tasks::NagiosCmd::_write_tick: failed: $@", cmd => $cmd);
+            print STDERR "NagiosCmd: _write_tick: \$err=$@\n";
             last WHILE;
         }
         $self->_cmd_log($cmd);
